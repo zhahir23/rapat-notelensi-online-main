@@ -1,0 +1,8 @@
+.venv/
+.venv-1/
+__pycache__/
+*.py[cod]
+*.db
+secret.key
+registered_faces/*
+!registered_faces/.gitkeep
