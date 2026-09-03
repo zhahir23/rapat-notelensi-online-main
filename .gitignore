@@ -3,6 +3,7 @@
 __pycache__/
 *.py[cod]
 *.db
+log_absensi_encrypted.csv
 secret.key
 registered_faces/*
 !registered_faces/.gitkeep
