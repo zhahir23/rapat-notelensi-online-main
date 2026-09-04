@@ -17,3 +17,18 @@
 2. benerin berita jangan di gabung ama pns tapi bisa ke publish ke website user, kalo bisa mah ad website berita untuk user gitu
 3. kalo keburu dan opsional pake sistem face track langsung ke diteksi si biodata pns nya
 4. memperbagus UI nya lebih enak di liat    
+
+## Konfigurasi Email OTP
+
+Email tujuan dapat berupa alamat apa pun. Gmail digunakan sebagai akun pengirim
+yang terautentikasi melalui App Password.
+
+Atur variabel berikut sebelum menjalankan aplikasi:
+
+```powershell
+$env:SENDER_EMAIL = "akun-pengirim@gmail.com"
+$env:SENDER_PASSWORD = "app-password-16-karakter"
+streamlit run notelensi_pemerintah.py
+```
+
+`SENDER_PASSWORD` harus berupa App Password Google, bukan password login Gmail biasa.

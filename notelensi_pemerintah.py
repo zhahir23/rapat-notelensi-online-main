@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     whisper = None
 
 try:
-    import cv2
+    import cv2  
 except ModuleNotFoundError:
     cv2 = None
 
@@ -36,13 +36,26 @@ from scipy.signal import butter, lfilter
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
-SENDER_EMAIL = "email_bot_sistem@gmail.com"
-SENDER_PASSWORD = "abcdefghijklmnop"
+
+def load_email_setting(name):
+    value = os.getenv(name)
+    if value:
+        return value
+    try:
+        return st.secrets.get(name, "")
+    except Exception:
+        return ""
+
+
+SENDER_EMAIL = load_email_setting("SENDER_EMAIL")
+SENDER_PASSWORD = load_email_setting("SENDER_PASSWORD")
 
 
 def kirim_email_otp(target_email, otp_code, nama_penerima, tujuan="reset"):
     """Mengirimkan email OTP ke EMAIL MASING-MASING PENGGUNA (Dinamis).
     tujuan: 'reset' untuk reset password, 'registrasi' untuk verifikasi email pendaftaran."""
+    if not SENDER_EMAIL or not SENDER_PASSWORD:
+        return False, "Konfigurasi SENDER_EMAIL dan SENDER_PASSWORD belum diatur."
     try:
         msg = MIMEMultipart()
         msg['From'] = f"GovScribe System <{SENDER_EMAIL}>"
@@ -66,7 +79,7 @@ Jangan berikan kode ini kepada siapa pun.
             msg['Subject'] = f"[{otp_code}] Kode OTP Reset Password"
             body = f"""Halo {nama_penerima},
 
-Berikut adalah Kode OTP verifikasi Anda untuk reset password:
+Berikut adalah Kode OTP untuk mereset kata sandi akun GovScribe Anda:
 
 ==============================
 KODE OTP: {otp_code}

@@ -7,3 +7,5 @@ log_absensi_encrypted.csv
 secret.key
 registered_faces/*
 !registered_faces/.gitkeep
+.env
+.streamlit/secrets.toml
