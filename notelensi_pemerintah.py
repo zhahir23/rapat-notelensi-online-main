@@ -111,13 +111,22 @@ if not os.path.exists(FACESHOT_DIR):
 
 
 def load_or_generate_key():
-    if not os.path.exists(KEY_FILE):
-        key = Fernet.generate_key()
-        with open(KEY_FILE, "wb") as key_file:
-            key_file.write(key)
-    else:
+    configured_key = load_email_setting("FERNET_KEY")
+    if configured_key:
+        key = configured_key.encode("ascii")
+    elif os.path.exists(KEY_FILE):
         with open(KEY_FILE, "rb") as key_file:
-            key = key_file.read()
+            key = key_file.read().strip()
+    else:
+        key = Fernet.generate_key()
+
+    try:
+        Fernet(key)
+    except (ValueError, TypeError):
+        key = Fernet.generate_key()
+
+    with open(KEY_FILE, "wb") as key_file:
+        key_file.write(key)
     return key
 
 
