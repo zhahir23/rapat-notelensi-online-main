@@ -344,7 +344,9 @@ def render_dashboard():
         st.markdown("<div class='section-card'><div class='eyebrow'>AKSI CEPAT</div><h3>Mulai pekerjaan</h3>", unsafe_allow_html=True)
         st.write("Gunakan workspace untuk merekam audio, membuat notulensi, dan menerbitkan hasil rapat.")
         if st.button("Buka workspace rapat", type="primary", use_container_width=True):
-            st.session_state["internal_page"] = "Workspace Rapat"
+            # Tidak boleh mengubah internal_page langsung, karena radio dengan
+            # key yang sama sudah dibuat lebih dulu di run ini.
+            st.session_state["nav_tujuan"] = "Workspace Rapat"
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -513,16 +515,26 @@ if not st.session_state["logged_in"]:
         render_public_portal()
 else:
     render_brand()
+    MENU_UTAMA = ["Dashboard", "Workspace Rapat", "Portal Berita", "Absensi & Keamanan", "Profil"]
+
     if "internal_page" not in st.session_state:
         st.session_state["internal_page"] = "Dashboard"
+
+    # Perpindahan halaman yang dipicu tombol di dalam halaman lain dititipkan
+    # lewat nav_tujuan, lalu diterapkan di sini SEBELUM radio dibuat.
+    if "nav_tujuan" in st.session_state:
+        st.session_state["internal_page"] = st.session_state.pop("nav_tujuan")
+
     st.sidebar.markdown("<div class='eyebrow' style='color:#8fd0d0'>MENU UTAMA</div>", unsafe_allow_html=True)
+
+    # key="internal_page" membuat radio membaca dan menulis session_state
+    # secara langsung, jadi nilainya tidak pernah tertinggal satu langkah.
     internal_page = st.sidebar.radio(
         "Navigasi internal",
-        ["Dashboard", "Workspace Rapat", "Portal Berita", "Absensi & Keamanan", "Profil"],
-        index=["Dashboard", "Workspace Rapat", "Portal Berita", "Absensi & Keamanan", "Profil"].index(st.session_state["internal_page"]),
-        label_visibility="collapsed"
+        MENU_UTAMA,
+        key="internal_page",
+        label_visibility="collapsed",
     )
-    st.session_state["internal_page"] = internal_page
 
     st.sidebar.divider()
     if st.sidebar.button("Keluar dan absen", use_container_width=True):
