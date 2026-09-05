@@ -2,10 +2,17 @@
 .venv-1/
 __pycache__/
 *.py[cod]
+
+# Data & kunci — JANGAN pernah di-upload ke GitHub
 *.db
-log_absensi_encrypted.csv
+*.db.backup
 secret.key
+secret.key.backup
+.streamlit/secrets.toml
+log_absensi_encrypted.csv*
 registered_faces/*
 !registered_faces/.gitkeep
-.env
-.streamlit/secrets.toml
+
+# File sementara audio
+temp_raw.*
+temp_clean.wav
