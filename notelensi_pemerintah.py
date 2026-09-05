@@ -16,7 +16,7 @@ import streamlit as st
 try:
     import whisper
 except ModuleNotFoundError:
-    whisper = None
+    whisper = None 
 
 try:
     import cv2  
@@ -35,7 +35,6 @@ from scipy.signal import butter, lfilter
 # ==========================================
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-
 
 def load_email_setting(name):
     value = os.getenv(name)
@@ -99,7 +98,6 @@ Jangan berikan kode ini kepada siapa pun.
     except Exception as e:
         return False, str(e)
 
-
 # ==========================================
 # SETUP & INTEGRASI SISTEM KEAMANAN (AES-256)
 # ==========================================
@@ -108,7 +106,6 @@ FACESHOT_DIR = "registered_faces"
 
 if not os.path.exists(FACESHOT_DIR):
     os.makedirs(FACESHOT_DIR)
-
 
 def load_or_generate_key():
     configured_key = load_email_setting("FERNET_KEY")
@@ -512,7 +509,6 @@ def modal_edit_berita(item):
             st.success("Berita berhasil diperbarui!")
             st.rerun()
 
-
 # ==========================================
 # MODUL PEMBERSIH NOISE & WHISPER AI
 # ==========================================
@@ -565,7 +561,6 @@ def buat_dokumen_word(judul, isi_teks):
     doc.save(bio)
     bio.seek(0)
     return bio
-
 
 def ekstrak_poin_masyarakat(teks_notulensi):
     kalimat_list = teks_notulensi.split(". ")
@@ -686,6 +681,24 @@ h1, h2, h3, h4 { font-family:'Space Grotesk', sans-serif; letter-spacing:0; colo
 [data-testid="stAppViewContainer"] [data-testid="stTextArea"] textarea::placeholder { color:#9fb0ba !important; }
 [data-testid="stAppViewContainer"] [data-baseweb="select"] span { color:var(--ink) !important; }
 [data-testid="stAppViewContainer"] label p { color:var(--ink) !important; font-weight:600; font-size:13.5px; }
+
+/* ---------- TOMBOL LIHAT PASSWORD ---------- */
+[data-testid="stAppViewContainer"] [data-testid="stTextInput"] button[aria-label*="password" i] {
+    min-width:46px !important; min-height:40px !important; margin:0 !important;
+    padding:0 12px !important; background:var(--navy) !important;
+    border:0 !important; border-left:1px solid var(--navy-2) !important;
+    border-radius:0 9px 9px 0 !important; color:white !important;
+    box-shadow:none !important; opacity:1 !important;
+}
+[data-testid="stAppViewContainer"] [data-testid="stTextInput"] button[aria-label*="password" i]:hover,
+[data-testid="stAppViewContainer"] [data-testid="stTextInput"] button[aria-label*="password" i]:focus-visible {
+    background:var(--blue) !important; color:white !important;
+    border-left-color:var(--blue) !important; outline:3px solid rgba(47,111,237,.22) !important;
+}
+[data-testid="stAppViewContainer"] [data-testid="stTextInput"] button[aria-label*="password" i] svg {
+    width:21px !important; height:21px !important; stroke:white !important;
+    stroke-width:2.5 !important; opacity:1 !important;
+}
 
 [data-testid="stAppViewContainer"] .stButton button {
   background:var(--paper) !important; color:var(--navy) !important;
@@ -1376,47 +1389,14 @@ def _render_auth_main():
                         if not wajah_valid:
                             modal_status_foto(False, after_ok_rerun=False)
                         else:
-                            generated_otp = "".join(random.choices(string.digits, k=6))
-                            with st.spinner("Mengirimkan kode verifikasi ke email Anda..."):
-                                sukses, pesan = kirim_email_otp(reg_email, generated_otp, reg_nama, tujuan="registrasi")
-                            if sukses:
-                                st.session_state["reg_otp_code"] = generated_otp
-                                st.session_state["reg_pending"] = {
-                                    "nip": reg_nip, "username": reg_username, "nama": reg_nama,
-                                    "email": reg_email, "password": reg_pass,
-                                    "foto_bytes": reg_photo.getvalue()
-                                }
-                                st.session_state["reg_stage"] = "otp"
-                                modal_status_foto(True)
-                            else:
-                                st.error(f"Gagal mengirim OTP verifikasi: {pesan}")
-
-        else:  # reg_stage == "otp"
-            pending = st.session_state["reg_pending"]
-            st.markdown(f"<div class='login-note'>📧 Kode OTP verifikasi telah dikirim ke <b>{pending.get('email','-')}</b>. Masukkan kode tersebut untuk menyelesaikan pendaftaran dan memverifikasi email Anda.</div>", unsafe_allow_html=True)
-            otp_input = st.text_input("Kode OTP Verifikasi Email", max_chars=6, key="reg_otp_input")
-
-            c1, c2 = st.columns(2)
-            with c1:
-                if st.button("Verifikasi & Selesaikan Pendaftaran", type="primary", use_container_width=True):
-                    if otp_input == st.session_state["reg_otp_code"]:
-                        p = st.session_state["reg_pending"]
-                        foto_io = io.BytesIO(p["foto_bytes"])
-                        save_user_to_db(p["nip"], p["username"], p["password"], p["email"], p["nama"], foto_io)
-                        st.session_state["reg_stage"] = "form"
-                        st.session_state["reg_pending"] = {}
-                        st.session_state["reg_otp_code"] = None
-                        st.session_state["auth_view"] = "login"
-                        st.success(f"🎉 Registrasi berhasil! Email {p['email']} telah terverifikasi. Silakan login.")
-                        st.rerun()
-                    else:
-                        st.error("Kode OTP salah! Silakan periksa email Anda kembali.")
-            with c2:
-                if st.button("Batal / Kirim Ulang", use_container_width=True):
-                    st.session_state["reg_stage"] = "form"
-                    st.session_state["reg_pending"] = {}
-                    st.session_state["reg_otp_code"] = None
-                    st.rerun()
+                            foto_io = io.BytesIO(reg_photo.getvalue())
+                            save_user_to_db(reg_nip, reg_username, reg_pass, reg_email, reg_nama, foto_io)
+                            st.session_state["reg_stage"] = "form"
+                            st.session_state["reg_pending"] = {}
+                            st.session_state["reg_otp_code"] = None
+                            st.session_state["auth_view"] = "login"
+                            st.success("🎉 Registrasi berhasil! Silakan login dengan akun baru Anda.")
+                            st.rerun()
 
 
 # ------------------------------------------
